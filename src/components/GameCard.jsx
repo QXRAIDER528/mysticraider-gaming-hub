@@ -1,0 +1,1 @@
+export default function GameCard({ name, genre, rating }) { return <article className="game-card"><div className="game-art"><b>{name.split(' ').map(word => word[0]).join('')}</b><span>★ {rating}</span></div><div><small>{genre}</small><h3>{name}</h3><a href="#games">View details →</a></div></article> }
