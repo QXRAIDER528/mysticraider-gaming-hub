@@ -1,25 +1,38 @@
+import { useState } from 'react'
 import Navbar from './components/Navbar.jsx'
 import Hero from './components/Hero.jsx'
 import GameCard from './components/GameCard.jsx'
 import Footer from './components/Footer.jsx'
 
 const games = [
-  ['NEON RIFT', 'Tactical shooter', '4.9'],
-  ['APEX VELOCITY', 'Racing', '4.8'],
-  ['MYTHIC WILDS', 'Open-world RPG', '4.7'],
-  ['ZERO PROTOCOL', 'Battle royale', '4.9'],
+  ['NEON RIFT', 'Tactical shooter', 'Action', '4.9'],
+  ['APEX VELOCITY', 'Racing', 'Racing', '4.8'],
+  ['MYTHIC WILDS', 'Open-world RPG', 'Adventure', '4.7'],
+  ['ZERO PROTOCOL', 'Battle royale', 'Action', '4.9'],
 ]
 
 function SectionTitle({ eyebrow, title }) { return <div className="section-title"><p>{eyebrow}</p><h2>{title}</h2></div> }
 
 export default function App() {
+  const [search, setSearch] = useState('')
+  const [selectedGenre, setSelectedGenre] = useState('All')
+  const visibleGames = games.filter(([name, type, genre]) => {
+    const matchesSearch = `${name} ${type} ${genre}`.toLowerCase().includes(search.toLowerCase())
+    return matchesSearch && (selectedGenre === 'All' || selectedGenre === genre)
+  })
+
   return <div className="site-shell">
     <Navbar />
     <main>
       <Hero />
       <section id="games" className="section">
         <SectionTitle eyebrow="Discover your next obsession" title="Trending games" />
-        <div className="game-grid">{games.map(([name, genre, rating]) => <GameCard key={name} name={name} genre={genre} rating={rating} />)}</div>
+        <div className="game-tools">
+          <label className="search-box"><span>⌕</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search games or genres" aria-label="Search games" /></label>
+          <div className="filters">{['All', 'Action', 'Adventure', 'Racing'].map((genre) => <button className={selectedGenre === genre ? 'active' : ''} onClick={() => setSelectedGenre(genre)} key={genre}>{genre}</button>)}</div>
+        </div>
+        <div className="game-grid">{visibleGames.map(([name, type, , rating]) => <GameCard key={name} name={name} genre={type} rating={rating} />)}</div>
+        {visibleGames.length === 0 && <p className="no-results">No games match that search. Try another title or genre.</p>}
       </section>
       <section id="news" className="section">
         <SectionTitle eyebrow="From the arena" title="Fresh gaming intel" />
