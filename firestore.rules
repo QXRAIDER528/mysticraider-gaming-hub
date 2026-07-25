@@ -1,0 +1,102 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in player can access only their own profile document.
+    match /profiles/{playerId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == playerId;
+      }
+
+      function isValidProfile() {
+        return request.resource.data.keys().hasOnly([
+          'gamerTag', 'favoriteGame', 'region', 'gameUid', 'avatarUrl', 'rank',
+          'matchesPlayed', 'wins', 'kills', 'deaths', 'socialLinks', 'updatedAt'
+        ])
+        && request.resource.data.gamerTag is string
+        && request.resource.data.gamerTag.size() >= 2
+        && request.resource.data.gamerTag.size() <= 18
+        && request.resource.data.favoriteGame is string
+        && request.resource.data.favoriteGame.size() <= 60
+        && request.resource.data.region is string
+        && request.resource.data.region.size() <= 40
+        && request.resource.data.gameUid is string
+        && request.resource.data.gameUid.size() <= 80
+        && request.resource.data.avatarUrl is string
+        && request.resource.data.avatarUrl.size() <= 2048
+        && request.resource.data.rank is string
+        && request.resource.data.rank.size() <= 40
+        && request.resource.data.matchesPlayed is int
+        && request.resource.data.matchesPlayed >= 0
+        && request.resource.data.matchesPlayed <= 1000000
+        && request.resource.data.wins is int
+        && request.resource.data.wins >= 0
+        && request.resource.data.wins <= request.resource.data.matchesPlayed
+        && request.resource.data.kills is int
+        && request.resource.data.kills >= 0
+        && request.resource.data.kills <= 10000000
+        && request.resource.data.deaths is int
+        && request.resource.data.deaths >= 0
+        && request.resource.data.deaths <= 10000000
+        && request.resource.data.socialLinks is map
+        && request.resource.data.socialLinks.keys().hasOnly([
+          'youtube', 'twitch', 'tiktok', 'discord', 'kick'
+        ])
+        && request.resource.data.socialLinks.youtube is string
+        && request.resource.data.socialLinks.youtube.size() <= 250
+        && request.resource.data.socialLinks.twitch is string
+        && request.resource.data.socialLinks.twitch.size() <= 250
+        && request.resource.data.socialLinks.tiktok is string
+        && request.resource.data.socialLinks.tiktok.size() <= 250
+        && request.resource.data.socialLinks.discord is string
+        && request.resource.data.socialLinks.discord.size() <= 250
+        && request.resource.data.socialLinks.kick is string
+        && request.resource.data.socialLinks.kick.size() <= 250
+        && request.resource.data.updatedAt is timestamp;
+      }
+
+      allow get: if isOwner();
+      allow list: if false;
+      allow create, update: if isOwner() && isValidProfile();
+      allow delete: if isOwner();
+    }
+
+    // Signed-in players can share safe gameplay insights without exposing private profiles or UIDs.
+    match /strategyPosts/{postId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isAuthor() {
+        return isSignedIn() && request.auth.uid == resource.data.authorId;
+      }
+
+      function isValidPost() {
+        return request.resource.data.keys().hasOnly([
+          'authorId', 'authorName', 'game', 'category', 'title', 'body', 'createdAt'
+        ])
+        && request.resource.data.authorId is string
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() >= 2
+        && request.resource.data.authorName.size() <= 18
+        && request.resource.data.game is string
+        && request.resource.data.game.size() <= 60
+        && request.resource.data.category is string
+        && request.resource.data.category.size() <= 30
+        && request.resource.data.title is string
+        && request.resource.data.title.size() >= 4
+        && request.resource.data.title.size() <= 80
+        && request.resource.data.body is string
+        && request.resource.data.body.size() >= 12
+        && request.resource.data.body.size() <= 1000
+        && request.resource.data.createdAt is timestamp;
+      }
+
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidPost();
+      allow update: if isAuthor() && isValidPost();
+      allow delete: if isAuthor();
+    }
+  }
+}
