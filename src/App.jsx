@@ -11,6 +11,7 @@ import CommunityModal from './components/CommunityModal.jsx'
 import CommunityProfiles from './components/CommunityProfiles.jsx'
 import StrategyBoard from './components/StrategyBoard.jsx'
 import CreatorHub from './components/CreatorHub.jsx'
+import About from './components/About.jsx'
 import Footer from './components/Footer.jsx'
 import { countries, countryCodeFor } from './data/countries.js'
 import animeWorldBackground from './assets/mysticraider-anime-world-bg.png'
@@ -180,6 +181,7 @@ export default function App() {
         <div><SectionTitle eyebrow="COUNTRY COMMUNITY BOARD" title="Play for your nation." /><p className="body-copy">Search for any country, choose your home nation, and join its board with your private player profile. Player data stays private unless we later add a separate public opt-in.</p><button className="secondary-button" onClick={() => setCommunityOpen(true)}>{member ? 'Update my country' : 'Choose my country'}</button></div>
         <div className="leaderboard"><label className="country-picker">FIND A COUNTRY<input list="leaderboard-country-list" value={leaderboardCountry} onChange={(event) => setLeaderboardCountry(event.target.value)} placeholder="Search countries" aria-label="Search country leaderboards" /><datalist id="leaderboard-country-list">{countries.map((country) => <option key={country.code} value={country.name} />)}</datalist></label>{selectedCountry ? <><div className="country-board-heading"><span>{currentCountry}</span><small>{member?.region === currentCountry ? 'YOUR PROFILE IS JOINED' : 'COMMUNITY BOARD'}</small></div><div className="table-head"><span>RANK</span><span>PLAYER</span><span>COUNTRY</span><span>STATS</span></div>{countryRows.length ? countryRows.map(([rank, name, code, stats]) => <div className={rank === 'YOU' ? 'player player-you' : 'player'} key={`${currentCountry}-${name}`}><b>{rank}</b><span><i>{name[0]}</i>{name}</span><em>{code}</em><strong>{stats}</strong></div>) : <div className="country-empty"><b>No players are displayed on the {currentCountry} board yet.</b><p>Choose {currentCountry} in your private profile to join it from your own view.</p></div>}</> : <div className="country-empty"><b>Choose a country from the search suggestions.</b><p>Every country has its own community board.</p></div>}</div>
       </section>
+      <About />
     </main>
     <Footer />
     {selectedGame && <GameDetailsModal game={selectedGame} onClose={() => setSelectedGame(null)} />}
