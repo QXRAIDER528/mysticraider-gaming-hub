@@ -31,6 +31,8 @@ Enable Firebase Authentication with Email/Password and create a Cloud Firestore 
 
 MysticRaider is the public platform brand and founder identity. This repository is proprietary and is provided under the [MysticRaider Proprietary License](LICENSE). No reuse, copying, or distribution is permitted without written permission.
 
+Brand contact: [mysticraider.gaming@gmail.com](mailto:mysticraider.gaming@gmail.com)
+
 ## Public launch
 
-The project will be deployed to Firebase Hosting. A brand contact email, custom domain, privacy policy, and public platform terms will be added before public launch.
+The project will be deployed to Firebase Hosting. A custom domain, privacy policy, and public platform terms will be added before public launch.
